@@ -382,7 +382,7 @@ class AssetManager extends EventDispatcher
      *  @param onProgress   <code>function(ratio:Number):void;</code>
      */
     public function loadQueue(onComplete:Void->Void,
-                              onError:String->Void=null, onProgress:Float->Void=null):Void
+                              onError:String->Void=null, onProgress:Float->Void=null, onSingleComplete:String->Void=null):Void
     {
         var self:AssetManager = this;
         var canceled:Bool = false;
@@ -428,6 +428,7 @@ class AssetManager extends EventDispatcher
             else
             {
                 if (name != null && asset != null) addAsset(name, asset, type);
+				Execute.execute(onSingleComplete, [name]);
                 numComplete++;
 
                 if (numComplete == numAssets)
