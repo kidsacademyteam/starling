@@ -1,0 +1,95 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+
+  package-haxelib:
+    runs-on: macos-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: starling-haxelib
+          path: |
+            ./
+            !lib/
+            !samples/
+            !scripts/
+            !tests/
+            !haxe-*-*/
+            !neko-*-*/
+            !.git/
+            !webpack.*
+            !package.json
+          if-no-files-found: error
+
+  docs:
+    runs-on: macos-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.0.5
+
+      - name: Set HAXEPATH
+        run: |
+          echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+
+      - name: Install Haxe dependencies
+        run: |
+          haxelib install lime 7.9.0 --quiet
+          haxelib install openfl --quiet
+          haxelib install dox --quiet
+          haxelib dev starling $GITHUB_WORKSPACE
+
+      - name: Build docs
+        working-directory: scripts
+        run: |
+          haxe docs.hxml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: starling-docs
+          path: docs
+          if-no-files-found: error
+
+  samples:
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.0.5
+
+      - name: Set HAXEPATH
+        run: |
+          echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+
+      - name: Install Haxe dependencies
+        run: |
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          haxelib dev starling $GITHUB_WORKSPACE
+
+      - name: Build samples/demo
+        working-directory: samples/demo
+        run: |
+          haxelib run lime build html5
+          haxelib run lime build neko
+          haxelib run lime build hl
+          haxelib run lime build flash
+
+      - name: Build samples/particle_demo
+        working-directory: samples/particle_demo
+        run: |
+          haxelib run lime build html5
+          haxelib run lime build neko
+          haxelib run lime build hl
+          haxelib run lime build flash

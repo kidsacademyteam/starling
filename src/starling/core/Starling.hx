@@ -358,7 +358,7 @@ class Starling extends EventDispatcher
         setMultitouchEnabled(Multitouch.inputMode == MultitouchInputMode.TOUCH_POINT, true);
 
         // make the native overlay behave just like one would expect intuitively
-        __nativeOverlayBlocksTouches = true;
+        nativeOverlayBlocksTouches = true;
         
         // all other modes are problematic in Starling, so we force those here
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -527,11 +527,14 @@ class Starling extends EventDispatcher
             if (!shareContext)
                 __painter.present();
         }
+		else
+		{
+			dispatchEventWith(starling.events.Event.SKIP_FRAME);
+		}
 
         if (__statsDisplay != null)
         {
             __statsDisplay.drawCount = __painter.drawCount;
-            if (!doRedraw) __statsDisplay.markFrameAsSkipped();
         }
     }
     
@@ -687,6 +690,7 @@ class Starling extends EventDispatcher
     {
         trace("[Starling] Context restored.");
         updateViewPort(true);
+		__painter.setupContextDefaults();
         dispatchEventWith(Event.CONTEXT3D_CREATE, false, context);
     }
     
@@ -988,7 +992,7 @@ class Starling extends EventDispatcher
     private function get_nativeOverlay():Sprite { return __nativeOverlay; }
     
     /** If enabled, touches or mouse events on the native overlay won't be propagated to
-     *  Starling. @default true */
+     *  Starling. @default false */
     public var nativeOverlayBlocksTouches(get, set):Bool;
     private function get_nativeOverlayBlocksTouches():Bool
     {
@@ -999,7 +1003,7 @@ class Starling extends EventDispatcher
     {
         if (value != __nativeOverlayBlocksTouches)
             __touchProcessor.occlusionTest = value ? hitTestNativeOverlay : null;
-        return value;
+        return __nativeOverlayBlocksTouches = value;
     }
     
     /** Indicates if a small statistics box (with FPS, memory usage and draw count) is
@@ -1059,6 +1063,7 @@ class Starling extends EventDispatcher
 
             __stage.addChild(__statsDisplay);
             __statsDisplay.scaleX = __statsDisplay.scaleY = scale;
+			__statsDisplay.showSkipped = __skipUnchangedFrames;
             
             updateClippedViewPort();
             updateStatsDisplayPosition();
@@ -1209,6 +1214,7 @@ class Starling extends EventDispatcher
     {
         __skipUnchangedFrames = value;
         __nativeStageEmpty = false; // required by 'mustAlwaysRender'
+		if (__statsDisplay != null) __statsDisplay.showSkipped = value;
         return value;
     }
     
@@ -1228,12 +1234,12 @@ class Starling extends EventDispatcher
         return value;
     }
     
-    /** When enabled, all touches that start very close to the window edges are discarded.
-     *  On mobile, such touches often indicate swipes that are meant to open OS menus.
-     *  Per default, margins of 10 points at the very top and bottom of the screen are checked.
-     *  Call <code>starling.touchProcessor.setSystemGestureMargins()</code> to adapt the margins
-     *  in each direction. @default true on mobile, false on desktop
-     */
+    /** When enabled, all touches that start very close to the screen edges are discarded.
+	 *  On mobile, such touches often indicate swipes that are meant to use OS features.
+	 *  Per default, margins of 15 points at the top, bottom, and left side of the screen are
+	 *  checked. Call <code>starling.touchProcessor.setSystemGestureMargins()</code> to adapt
+	 *  the margins in each direction. @default true on mobile, false on desktop
+	 */
     public var discardSystemGestures(get, set):Bool;
     private function get_discardSystemGestures():Bool
     {
@@ -1266,19 +1272,19 @@ class Starling extends EventDispatcher
     private static function get_all():Vector<Starling> { return sAll; }
     
     /** The render context of the currently active Starling instance. */
-    // public static var context(get, never):Context3D;
-    // private static function get_context():Context3D { return sCurrent != null ? sCurrent.context : null; }
+    public static var currentContext(get, never):Context3D;
+    private static function get_currentContext():Context3D { return sCurrent != null ? sCurrent.context : null; }
     
     /** The default juggler of the currently active Starling instance. */
-    // public static var juggler(get, never):Juggler;
-    // private static function get_juggler():Juggler { return sCurrent != null ? sCurrent.__juggler : null; }
+    public static var currentJuggler(get, never):Juggler;
+    private static function get_currentJuggler():Juggler { return sCurrent != null ? sCurrent.__juggler : null; }
     
     /** The contentScaleFactor of the currently active Starling instance. */
-    // public static var contentScaleFactor(get, never):Float;
-    // private static function get_contentScaleFactor():Float 
-    // {
-    //     return sCurrent != null ? sCurrent.contentScaleFactor : 1.0;
-    // }
+    public static var currentContentScaleFactor(get, never):Float;
+    private static function get_currentContentScaleFactor():Float 
+    {
+        return sCurrent != null ? sCurrent.contentScaleFactor : 1.0;
+    }
     
     /** Indicates if multitouch input should be supported. You can enable or disable
      *  multitouch at any time; just beware that any current touches will be cancelled. */
