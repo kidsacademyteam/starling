@@ -17,7 +17,7 @@ import openfl.display3D.textures.TextureBase;
 import openfl.errors.Error;
 import openfl.events.ErrorEvent;
 import openfl.events.Event;
-
+import openfl.utils.ByteArray;
 import starling.core.Starling;
 
 /** @private
@@ -50,6 +50,18 @@ import starling.core.Starling;
               optimizedForRenderTexture, scale);
     }
 
+    override public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    {
+        var isAsync:Bool = async != null;
+
+        if (isAsync)
+            _textureReadyCallback = async;
+
+        uploadByteArray(data, 0, isAsync);
+
+        setDataUploaded();
+    }
+
     /** @inheritDoc */
     override public function uploadBitmapData(data:BitmapData, async:ConcreteTexture->Void=null):Void
     {
@@ -74,6 +86,44 @@ import starling.core.Starling;
     }
 
     // async upload
+
+    private function uploadByteArray(source:ByteArray, mipLevel:UInt, isAsync:Bool):Void
+    {
+        if (isAsync)
+        {
+            uploadAsyncByteArray(source, mipLevel);
+            base.addEventListener(Event.TEXTURE_READY, onTextureReady);
+            base.addEventListener(ErrorEvent.ERROR, onTextureReady);
+        }
+        else
+        {
+            rectBase.uploadFromByteArray(source, mipLevel);
+        }
+    }
+
+    private function uploadAsyncByteArray(source:ByteArray, mipLevel:UInt):Void
+    {
+        if (sAsyncUploadEnabled)
+        {
+            var method = Reflect.field(base, "uploadFromByteArray");
+            try { Reflect.callMethod(base, method, [source, mipLevel]); }
+            catch (error:Error)
+            {
+                if (error.errorID == 3708 || error.errorID == 1069)
+                    sAsyncUploadEnabled = false;
+                else
+                    throw error;
+            }
+        }
+
+        if (!sAsyncUploadEnabled)
+        {
+            Timer.delay(function () {
+                base.dispatchEvent(new Event(Event.TEXTURE_READY));
+            }, 1);
+            rectBase.uploadFromByteArray(source, 0);
+        }
+    }
 
     private function upload(source:BitmapData, isAsync:Bool):Void
     {

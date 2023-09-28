@@ -376,6 +376,26 @@ class Texture
         return texture;
     }
 
+    public static function fromByteArray(data:ByteArray, width:Int, height:Int, generateMipMaps:Bool=false,
+                                          optimizeForRenderToTexture:Bool=false,
+                                          scale:Float=1, format:Context3DTextureFormat=BGRA,
+                                          forcePotTexture:Bool=false,
+                                          async:Texture->Void=null, keepSourceForRestore:Bool = true):Texture
+    {
+        var texture:Texture = Texture.empty(width / scale, height / scale, true,
+        generateMipMaps, optimizeForRenderToTexture, scale,
+        format, forcePotTexture);
+
+        texture.root.uploadFromByteArray(data, async);
+
+        if (keepSourceForRestore)
+            texture.root.onRestore = function(textureRoot:ConcreteTexture):Void {textureRoot.uploadFromByteArray(data);};
+        else
+            data.clear();
+
+        return texture;
+    }
+
     /** Creates a texture from ATF data (Adobe Texture Compression).
      *  Beware: you must not dispose 'data' if Starling should handle a lost device context;
      *  alternatively, you can handle restoration yourself via "texture.root.onRestore".
