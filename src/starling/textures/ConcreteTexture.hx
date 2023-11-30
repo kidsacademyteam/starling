@@ -135,6 +135,11 @@ class ConcreteTexture extends Texture
         throw new NotSupportedError();
     }
 
+    public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    {
+        throw new NotSupportedError();
+    }
+
     /** Uploads ATF data from a ByteArray to the texture. Note that the size of the
     *  ATF-encoded data must be exactly the same as the original texture size.
     *  

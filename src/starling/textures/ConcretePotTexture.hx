@@ -115,6 +115,18 @@ import starling.utils.MathUtil;
         setDataUploaded();
     }
 
+    override public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    {
+        var isAsync:Bool = async != null;
+
+        if (isAsync)
+            _textureReadyCallback = async;
+
+        uploadByteArray(data, 0, isAsync);
+
+        setDataUploaded();
+    }
+
     /** @inheritDoc */
     override private function get_isPotTexture():Bool { return true; }
 
@@ -145,6 +157,44 @@ import starling.utils.MathUtil;
         else
         {
             potBase.uploadFromBitmapData(source, mipLevel);
+        }
+    }
+
+    private function uploadByteArray(source:ByteArray, mipLevel:UInt, isAsync:Bool):Void
+    {
+        if (isAsync)
+        {
+            uploadAsyncByteArray(source, mipLevel);
+            base.addEventListener(Event.TEXTURE_READY, onTextureReady);
+            base.addEventListener(ErrorEvent.ERROR, onTextureReady);
+        }
+        else
+        {
+            potBase.uploadFromByteArray(source, mipLevel);
+        }
+    }
+
+    private function uploadAsyncByteArray(source:ByteArray, mipLevel:UInt):Void
+    {
+        if (sAsyncUploadEnabled)
+        {
+            var method = Reflect.field(base, "uploadFromByteArray");
+            try { Reflect.callMethod(base, method, [source, mipLevel]); }
+            catch (error:Error)
+            {
+                if (error.errorID == 3708 || error.errorID == 1069)
+                    sAsyncUploadEnabled = false;
+                else
+                    throw error;
+            }
+        }
+
+        if (!sAsyncUploadEnabled)
+        {
+            Timer.delay(function () {
+                base.dispatchEvent(new Event(Event.TEXTURE_READY));
+            }, 1);
+            potBase.uploadFromByteArray(source, 0, mipLevel);
         }
     }
 
