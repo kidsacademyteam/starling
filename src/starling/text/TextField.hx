@@ -110,7 +110,7 @@ class TextField extends DisplayObjectContainer
     // helper objects
     private static var sMatrix:Matrix = new Matrix();
     private static var sDefaultCompositor:ITextCompositor = new TrueTypeCompositor();
-    private static var sDefaultTextureFormat:String = Context3DTextureFormat.BGRA_PACKED;
+    private static var sDefaultTextureFormat:String = Context3DTextureFormat.BGRA;
 
     #if commonjs
     private static function __init__ () {
@@ -265,7 +265,7 @@ class TextField extends DisplayObjectContainer
         var rightLine:Quad  = cast _border.getChildAt(1);
         var bottomLine:Quad = cast _border.getChildAt(2);
         var leftLine:Quad   = cast _border.getChildAt(3);
-        
+
         topLine.width    = width; topLine.height    = 1;
         bottomLine.width = width; bottomLine.height = 1;
         leftLine.width   = 1;     leftLine.height   = height;
