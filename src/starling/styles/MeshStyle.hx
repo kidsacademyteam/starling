@@ -94,6 +94,7 @@ class MeshStyle extends EventDispatcher
 {
     /** The vertex format expected by this style (the same as found in the MeshEffect-class). */
     public static var VERTEX_FORMAT:VertexDataFormat = MeshEffect.VERTEX_FORMAT;
+    public static var DEFAULT_TEXTURE_SMOOTHING:String = TextureSmoothing.BILINEAR;
 
     private var _type:Class<Dynamic>;
     private var _target:Mesh;
@@ -130,7 +131,7 @@ class MeshStyle extends EventDispatcher
     @:keep public function new()
     {
         super();
-        _textureSmoothing = TextureSmoothing.BILINEAR;
+        _textureSmoothing = DEFAULT_TEXTURE_SMOOTHING;
         _type = Type.getClass(this);
     }
     
