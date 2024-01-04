@@ -21,10 +21,16 @@ class TextureSmoothing
     
     /** Trilinear filtering. Highest quality by taking the next mip map level into account. */
     public static inline var TRILINEAR:String = "trilinear";
-    
+
+    public static inline var ANISOTROPIC2X:String = "anisotropic2x";
+    public static inline var ANISOTROPIC4X:String = "anisotropic4x";
+    public static inline var ANISOTROPIC8X:String = "anisotropic8x";
+    public static inline var ANISOTROPIC16X:String = "anisotropic16x";
+
     /** Determines whether a smoothing value is valid. */
     public static function isValid(smoothing:String):Bool
     {
-        return smoothing == NONE || smoothing == BILINEAR || smoothing == TRILINEAR;
+        return smoothing == NONE || smoothing == BILINEAR || smoothing == TRILINEAR
+        || smoothing == ANISOTROPIC2X|| smoothing == ANISOTROPIC4X || smoothing == ANISOTROPIC8X || smoothing == ANISOTROPIC16X;
     }
 }

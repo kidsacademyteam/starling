@@ -10,6 +10,7 @@
 
 package starling.textures;
 
+import openfl.display.StageQuality;
 import haxe.Timer;
 import openfl.display.BitmapData;
 import openfl.display3D.textures.TextureBase;
@@ -84,6 +85,9 @@ import starling.utils.MathUtil;
             data = buffer;
         }
 
+        #if html5
+        upload(data, 0, mipMapping, isAsync);
+        #else
         upload(data, 0, isAsync);
 
         if (mipMapping && data.width > 1 && data.height > 1)
@@ -100,8 +104,8 @@ import starling.utils.MathUtil;
             {
                 bounds.setTo(0, 0, currentWidth, currentHeight);
                 canvas.fillRect(bounds, 0);
-                canvas.draw(data, matrix, null, null, null, true);
-                upload(canvas, level++, false); // only level 0 supports async
+                canvas.drawWithQuality(data, matrix, null, null, null, false, StageQuality.BEST);
+                upload(canvas, level++, false, false); // only level 0 supports async
                 matrix.scale(0.5, 0.5);
                 currentWidth  = currentWidth  >> 1;
                 currentHeight = currentHeight >> 1;
@@ -109,20 +113,21 @@ import starling.utils.MathUtil;
 
             canvas.dispose();
         }
+        #end
 
         if (buffer != null) buffer.dispose();
 
         setDataUploaded();
     }
 
-    override public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    override public function uploadFromByteArray(data:ByteArray, generateMipMaps:Bool = false, async:ConcreteTexture->Void=null):Void
     {
         var isAsync:Bool = async != null;
 
         if (isAsync)
             _textureReadyCallback = async;
 
-        uploadByteArray(data, 0, isAsync);
+        uploadByteArray(data, 0, generateMipMaps, isAsync);
 
         setDataUploaded();
     }
@@ -146,40 +151,40 @@ import starling.utils.MathUtil;
         setDataUploaded();
     }
 
-    private function upload(source:BitmapData, mipLevel:UInt, isAsync:Bool):Void
+    private function upload(source:BitmapData, mipLevel:UInt, isGenerateMipMaps:Bool, isAsync:Bool):Void
     {
         if (isAsync)
         {
-            uploadAsync(source, mipLevel);
+            uploadAsync(source, mipLevel, isGenerateMipMaps);
             base.addEventListener(Event.TEXTURE_READY, onTextureReady);
             base.addEventListener(ErrorEvent.ERROR, onTextureReady);
         }
         else
         {
-            potBase.uploadFromBitmapData(source, mipLevel);
+            potBase.uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
         }
     }
 
-    private function uploadByteArray(source:ByteArray, mipLevel:UInt, isAsync:Bool):Void
+    private function uploadByteArray(source:ByteArray, mipLevel:UInt, isGenerateMipMaps:Bool, isAsync:Bool):Void
     {
         if (isAsync)
         {
-            uploadAsyncByteArray(source, mipLevel);
+            uploadAsyncByteArray(source, mipLevel, isGenerateMipMaps);
             base.addEventListener(Event.TEXTURE_READY, onTextureReady);
             base.addEventListener(ErrorEvent.ERROR, onTextureReady);
         }
         else
         {
-            potBase.uploadFromByteArray(source, mipLevel);
+            potBase.uploadFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
         }
     }
 
-    private function uploadAsyncByteArray(source:ByteArray, mipLevel:UInt):Void
+    private function uploadAsyncByteArray(source:ByteArray, mipLevel:UInt, isGenerateMipMaps:Bool):Void
     {
         if (sAsyncUploadEnabled)
         {
             var method = Reflect.field(base, "uploadFromByteArray");
-            try { Reflect.callMethod(base, method, [source, mipLevel]); }
+            try { Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]); }
             catch (error:Error)
             {
                 if (error.errorID == 3708 || error.errorID == 1069)
@@ -194,16 +199,16 @@ import starling.utils.MathUtil;
             Timer.delay(function () {
                 base.dispatchEvent(new Event(Event.TEXTURE_READY));
             }, 1);
-            potBase.uploadFromByteArray(source, 0, mipLevel);
+            potBase.uploadFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
         }
     }
 
-    private function uploadAsync(source:BitmapData, mipLevel:UInt):Void
+    private function uploadAsync(source:BitmapData, mipLevel:UInt, isGenerateMipMaps:Bool):Void
     {
         if (sAsyncUploadEnabled)
         {
             var method = Reflect.field(base, "uploadFromBitmapDataAsync");
-            try { Reflect.callMethod(base, method, [source, mipLevel]); }
+            try { Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]); }
             catch (error:Error)
             {
                 if (error.errorID == 3708 || error.errorID == 1069)
@@ -218,7 +223,7 @@ import starling.utils.MathUtil;
             Timer.delay(function () {
                 base.dispatchEvent(new Event(Event.TEXTURE_READY));
             }, 1);
-            potBase.uploadFromBitmapData(source);
+            potBase.uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
         }
     }
 

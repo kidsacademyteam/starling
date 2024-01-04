@@ -10,6 +10,7 @@
 
 package starling.textures;
 
+import openfl.display.StageQuality;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display3D.Context3D;
@@ -368,7 +369,7 @@ class Texture
     {
         var texture:Texture = Texture.empty(data.width / scale, data.height / scale, true,
                                             generateMipMaps, optimizeForRenderToTexture, scale,
-                                            format, forcePotTexture);
+                                            format, true);
 
         texture.root.uploadBitmapData(data, async);
         texture.root.onRestore = function(textureRoot:ConcreteTexture):Void {textureRoot.uploadBitmapData(data);};
@@ -386,7 +387,7 @@ class Texture
         generateMipMaps, optimizeForRenderToTexture, scale,
         format, forcePotTexture);
 
-        texture.root.uploadFromByteArray(data, async);
+        texture.root.uploadFromByteArray(data, generateMipMaps, async);
 
         if (keepSourceForRestore)
             texture.root.onRestore = function(textureRoot:ConcreteTexture):Void {textureRoot.uploadFromByteArray(data);};

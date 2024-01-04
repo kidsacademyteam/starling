@@ -135,6 +135,26 @@ class RenderUtil
             filter = Context3DTextureFilter.LINEAR;
             mipFilter = mipMapping ? Context3DMipFilter.MIPNEAREST : Context3DMipFilter.MIPNONE;
         }
+        else if (smoothing == TextureSmoothing.ANISOTROPIC2X)
+        {
+            filter = Context3DTextureFilter.ANISOTROPIC2X;
+            mipFilter = mipMapping ? Context3DMipFilter.MIPLINEAR : Context3DMipFilter.MIPNONE;
+        }
+        else if (smoothing == TextureSmoothing.ANISOTROPIC4X)
+        {
+            filter = Context3DTextureFilter.ANISOTROPIC4X;
+            mipFilter = mipMapping ? Context3DMipFilter.MIPLINEAR : Context3DMipFilter.MIPNONE;
+        }
+        else if (smoothing == TextureSmoothing.ANISOTROPIC8X)
+        {
+            filter = Context3DTextureFilter.ANISOTROPIC8X;
+            mipFilter = mipMapping ? Context3DMipFilter.MIPLINEAR : Context3DMipFilter.MIPNONE;
+        }
+        else if (smoothing == TextureSmoothing.ANISOTROPIC16X)
+        {
+            filter = Context3DTextureFilter.ANISOTROPIC16X;
+            mipFilter = mipMapping ? Context3DMipFilter.MIPLINEAR : Context3DMipFilter.MIPNONE;
+        }
         else
         {
             filter = Context3DTextureFilter.LINEAR;

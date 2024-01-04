@@ -50,7 +50,7 @@ import starling.core.Starling;
               optimizedForRenderTexture, scale);
     }
 
-    override public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    override public function uploadFromByteArray(data:ByteArray, genearteMipMaps:Bool = false, async:ConcreteTexture->Void=null):Void
     {
         var isAsync:Bool = async != null;
 

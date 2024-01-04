@@ -135,7 +135,7 @@ class ConcreteTexture extends Texture
         throw new NotSupportedError();
     }
 
-    public function uploadFromByteArray(data:ByteArray, async:ConcreteTexture->Void=null):Void
+    public function uploadFromByteArray(data:ByteArray, generateMipMaps:Bool = false, async:ConcreteTexture->Void=null):Void
     {
         throw new NotSupportedError();
     }
