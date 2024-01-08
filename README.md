@@ -1,4 +1,4 @@
-[![Simplified BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE.md) [![NPM Version](https://img.shields.io/npm/v/starling-framework.svg?style=flat)](http://npmjs.com/package/starling-framework) [![Haxelib Version](https://img.shields.io/github/tag/openfl/starling.svg?style=flat&label=haxelib)](http://lib.haxe.org/p/starling) [![Build Status](https://img.shields.io/circleci/project/github/openfl/starling/master.svg)](https://circleci.com/gh/openfl/starling)
+[![Simplified BSD License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](LICENSE.md) [![NPM Version](https://img.shields.io/npm/v/starling-framework.svg?style=flat)](http://npmjs.com/package/starling-framework) [![Haxelib Version](https://img.shields.io/github/tag/openfl/starling.svg?style=flat&label=haxelib)](http://lib.haxe.org/p/starling) [![Build Status](https://img.shields.io/github/actions/workflow/status/openfl/starling/main.yml?branch=master)](https://github.com/openfl/starling/actions)
 
 Starling Framework
 ==================
@@ -13,29 +13,6 @@ You can also pair Starling with OpenFL to deploy native builds for iOS, Android,
 While Starling mimics the classic display tree architecture of Adobe AIR/Flash, it provides much better performance than the Adobe version: all objects are rendered directly by the GPU (using the Stage3D API). When paired with OpenFL, Starling provides an alternative GPU renderer with helpful features. The complete architecture was designed for working well with the GPU; common game development tasks were built right into its core. Starling hides Stage3D internals from developers, but makes it easy to access them for those who need full performance and flexibility.
 
 Starling aims to be as lightweight and easy to use as possible. As an open-source project, much care was taken to make the source code easy to read, understand and extend. With under 15k lines of code, experienced developers can easily grasp it in its entirety, or modify it to their needs.
-
-Getting Started (NPM)
----------------------
-
-You can install the Yeoman generator to create an empty project:
-
-```bash
-npm install -g yo starling-framework-generator
-mkdir StarlingProject
-cd StarlingProject
-yo starling-framework
-```
-
-You can also try the Starling demo:
-
-```bash
-git clone https://github.com/openfl/starling
-cd starling/samples/demo_npm/typescript
-npm install
-npm start -s
-```
-
-There are ES5, ES6, Haxe and TypeScript versions of the demo available.
 
 Getting Started (Haxelib)
 -------------------------
@@ -63,6 +40,29 @@ openfl create starling:demo
 cd demo
 openfl test flash
 ```
+
+Getting Started (NPM)
+---------------------
+
+You can install the Yeoman generator to create an empty project:
+
+```bash
+npm install -g yo starling-framework-generator
+mkdir StarlingProject
+cd StarlingProject
+yo starling-framework
+```
+
+You can also try the Starling demo:
+
+```bash
+git clone https://github.com/openfl/starling
+cd starling/samples/demo_npm/typescript
+npm install
+npm start -s
+```
+
+There are AS3, ES5, ES6, Haxe and TypeScript versions of the demo available.
 
 Note about high-dpi support
 ---------------------------

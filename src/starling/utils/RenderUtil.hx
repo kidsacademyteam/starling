@@ -10,6 +10,7 @@
 
 package starling.utils;
 
+import openfl.display3D.Context3DProfile;
 import haxe.Constraints.Function;
 import haxe.Timer;
 
@@ -225,26 +226,26 @@ class RenderUtil
     }
 
     /** Requests a context3D object from the given Stage3D object.
-        *
-        * @param stage3D    The stage3D object the context needs to be requested from.
-        * @param renderMode The 'Context3DRenderMode' to use when requesting the context.
-        * @param profile    If you know exactly which 'Context3DProfile' you want to use, simply
-        *                   pass a String with that profile.
-        *
-        *                   <p>If you are unsure which profiles are supported on the current
-        *                   device, you can also pass an Array of profiles; they will be
-        *                   tried one after the other (starting at index 0), until a working
-        *                   profile is found. If none of the given profiles is supported,
-        *                   the Stage3D object will dispatch an ERROR event.</p>
-        *
-        *                   <p>You can also pass the String 'auto' to use the best available
-        *                   profile automatically. This will try all known Stage3D profiles,
-        *                   beginning with the most powerful.</p>
-        */
-    public static function requestContext3D(stage3D:Stage3D, renderMode:String, profile:Dynamic):Void
+    *
+    * @param stage3D    The stage3D object the context needs to be requested from.
+    * @param renderMode The 'Context3DRenderMode' to use when requesting the context.
+    * @param profile    If you know exactly which 'Context3DProfile' you want to use, simply
+    *                   pass a Context3DProfile value, or a String with that profile.
+    *
+    *                   <p>If you are unsure which profiles are supported on the current
+    *                   device, you can also pass an Array of profiles; they will be
+    *                   tried one after the other (starting at index 0), until a working
+    *                   profile is found. If none of the given profiles is supported,
+    *                   the Stage3D object will dispatch an ERROR event.</p>
+    *
+    *                   <p>You can also pass the String 'auto' to use the best available
+    *                   profile automatically. This will try all known Stage3D profiles,
+    *                   beginning with the most powerful.</p>
+    */
+    public static function requestContext3D(stage3D:Stage3D, renderMode:Context3DRenderMode, profile:Dynamic):Void
     {
-        var profiles:Array<Dynamic>;
-        var currentProfile:String;
+        var profiles:Array<Context3DProfile>;
+        var currentProfile:Context3DProfile;
         var executeFunc:Function->Array<Dynamic>->Void = SystemUtil.isDesktop ?
                 execute : SystemUtil.executeWhenApplicationIsActive;
 
@@ -252,10 +253,34 @@ class RenderUtil
             profiles = ["enhanced",
                         "standardExtended", "standard", "standardConstrained",
                         "baselineExtended", "baseline", "baselineConstrained"];
+        else if (#if (haxe_ver < 4.2) Std.is #else Std.isOfType #end(profile, Int))
+            profiles = [cast profile];
         else if (#if (haxe_ver < 4.2) Std.is #else Std.isOfType #end(profile, String))
+         {
+            // ensure that the Haxe compiler knows it's a String instead of Dynamic
+            // it's not required on all targets, but some may throw exceptions with Dynamic
+            // for instance, on HashLink, it throws 'Can't cast String to i32'
             profiles = [Std.string(profile)];
+        }
         else if (#if (haxe_ver < 4.2) Std.is #else Std.isOfType #end(profile, Array))
-            profiles = cast(profile, Array<Dynamic>);
+        {
+            var dynProfiles:Array<Dynamic> = cast(profile, Array<Dynamic>);
+            profiles = [];
+            for (prof in dynProfiles)
+            {
+                if (#if (haxe_ver < 4.2) Std.is #else Std.isOfType #end(prof, Int))
+                {
+                    profiles.push(cast prof);
+                }
+                else 
+                {
+                    // ensure that the Haxe compiler knows it's a String instead of Dynamic
+                    // it's not required on all targets, but some may throw exceptions with Dynamic
+                    // for instance, on HashLink, it throws 'Can't cast String to i32'
+                    profiles.push(Std.string(prof));
+                }
+            }
+        }
         else
             throw new ArgumentError("Profile must be of type 'String' or 'Array'");
 
