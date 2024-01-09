@@ -88,7 +88,7 @@ import starling.utils.MathUtil;
         #if html5
         upload(data, 0, mipMapping, isAsync);
         #else
-        upload(data, 0, isAsync);
+        upload(data, 0, false, isAsync);
 
         if (mipMapping && data.width > 1 && data.height > 1)
         {
@@ -161,7 +161,7 @@ import starling.utils.MathUtil;
         }
         else
         {
-            potBase.uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
+            uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
         }
     }
 
@@ -175,7 +175,7 @@ import starling.utils.MathUtil;
         }
         else
         {
-            potBase.uploadFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
+            uploadDataFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
         }
     }
 
@@ -184,7 +184,13 @@ import starling.utils.MathUtil;
         if (sAsyncUploadEnabled)
         {
             var method = Reflect.field(base, "uploadFromByteArray");
-            try { Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]); }
+            try {
+                #if flash
+                Reflect.callMethod(base, method, [source, mipLevel]);
+                #else
+                Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]);
+                #end
+            }
             catch (error:Error)
             {
                 if (error.errorID == 3708 || error.errorID == 1069)
@@ -199,7 +205,7 @@ import starling.utils.MathUtil;
             Timer.delay(function () {
                 base.dispatchEvent(new Event(Event.TEXTURE_READY));
             }, 1);
-            potBase.uploadFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
+            uploadDataFromByteArray(source, 0, mipLevel, isGenerateMipMaps);
         }
     }
 
@@ -208,7 +214,13 @@ import starling.utils.MathUtil;
         if (sAsyncUploadEnabled)
         {
             var method = Reflect.field(base, "uploadFromBitmapDataAsync");
-            try { Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]); }
+            try {
+                #if flash
+                Reflect.callMethod(base, method, [source, mipLevel]);
+                #else
+                Reflect.callMethod(base, method, [source, mipLevel, isGenerateMipMaps]);
+                #end
+            }
             catch (error:Error)
             {
                 if (error.errorID == 3708 || error.errorID == 1069)
@@ -223,7 +235,7 @@ import starling.utils.MathUtil;
             Timer.delay(function () {
                 base.dispatchEvent(new Event(Event.TEXTURE_READY));
             }, 1);
-            potBase.uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
+            uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
         }
     }
 
@@ -241,6 +253,22 @@ import starling.utils.MathUtil;
     private function get_potBase():openfl.display3D.textures.Texture
     {
         return cast base;
+    }
+
+    private function uploadDataFromByteArray(source:ByteArray, byteArrayOffset:UInt, mipLevel:UInt, isGenerateMipMaps:Bool) {
+        #if flash
+        potBase.uploadFromByteArray(source, mipLevel);
+        #else
+        potBase.uploadFromByteArray(source, mipLevel, isGenerateMipMaps);
+        #end
+    }
+
+    private function uploadFromBitmapData(source:BitmapData, mipLevel:UInt, isGenerateMipMaps:Bool) {
+        #if flash
+        potBase.uploadFromBitmapData(source, mipLevel);
+        #else
+        potBase.uploadFromBitmapData(source, mipLevel, isGenerateMipMaps);
+        #end
     }
 
     /** @private */
