@@ -10,6 +10,8 @@
 
 package starling.styles;
 
+import haxe.Constraints.Function;
+
 import openfl.display3D.textures.TextureBase;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -258,7 +260,7 @@ class MeshStyle extends EventDispatcher
 
     // enter frame event
 
-    override public function addEventListener(type:String, listener:Dynamic):Void
+    override public function addEventListener(type:String, listener:Function):Void
     {
         if (type == Event.ENTER_FRAME && _target != null)
             _target.addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -266,7 +268,7 @@ class MeshStyle extends EventDispatcher
         super.addEventListener(type, listener);
     }
 
-    override public function removeEventListener(type:String, listener:Dynamic):Void
+    override public function removeEventListener(type:String, listener:Function):Void
     {
         if (type == Event.ENTER_FRAME && _target != null)
             _target.removeEventListener(type, onEnterFrame);
