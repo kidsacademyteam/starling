@@ -10,9 +10,9 @@
 
 package starling.textures;
 
-import openfl.display.StageQuality;
 import haxe.Timer;
 import openfl.display.BitmapData;
+import openfl.display.StageQuality;
 import openfl.display3D.textures.TextureBase;
 import openfl.errors.ArgumentError;
 import openfl.errors.Error;
@@ -22,7 +22,6 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.utils.ByteArray;
-
 import starling.core.Starling;
 import starling.utils.MathUtil;
 
@@ -255,15 +254,15 @@ import starling.utils.MathUtil;
         return cast base;
     }
 
-    private function uploadDataFromByteArray(source:ByteArray, byteArrayOffset:UInt, mipLevel:UInt, isGenerateMipMaps:Bool) {
+    private function uploadDataFromByteArray(source:ByteArray, byteArrayOffset:UInt, mipLevel:UInt, isGenerateMipMaps:Bool):Void {
         #if flash
-        potBase.uploadFromByteArray(source, mipLevel);
+        potBase.uploadFromByteArray(source, byteArrayOffset, mipLevel);
         #else
-        potBase.uploadFromByteArray(source, mipLevel, isGenerateMipMaps);
+        potBase.uploadFromByteArray(source, byteArrayOffset, mipLevel, isGenerateMipMaps);
         #end
     }
 
-    private function uploadFromBitmapData(source:BitmapData, mipLevel:UInt, isGenerateMipMaps:Bool) {
+    private function uploadFromBitmapData(source:BitmapData, mipLevel:UInt, isGenerateMipMaps:Bool):Void {
         #if flash
         potBase.uploadFromBitmapData(source, mipLevel);
         #else
